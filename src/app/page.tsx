@@ -1,21 +1,24 @@
-import About from "./components/About";
-import Contact from "./components/Contact"; // Assuming you create this
-import Footer from "./components/Footer"; // Assuming you create this
-import Header from "./components/Header";
-import Hero from "./components/Hero";
-import Portfolio from "./components/Portfolio";
-import Resume from "./components/Resume"; // Assuming you create this
+import Header from "../components/Header";
+import Hero from "../components/Hero";
+import About from "../components/About";
+import Resume from "../components/Resume";
+import Stats from "../components/Stats";
+import Portfolio from "../components/Portfolio";
+import Contact from "../components/Contact";
+import ChatBot from "../components/Chatbot";
 
 export default function Home() {
   return (
-    <div>
+    <div className="min-h-screen">
       <Header />
       <Hero />
       <About />
       <Resume />
+      <Stats />
       <Portfolio />
       <Contact />
-      <Footer />
+      <ChatBot />
+      <div id="overlay" />
     </div>
   );
 }
