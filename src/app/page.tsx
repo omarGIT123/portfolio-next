@@ -9,7 +9,8 @@ import ChatBot from "../components/Chatbot";
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    // Replace the <div> with a React Fragment <>
+    <>
       <Header />
       <Hero />
       <About />
@@ -19,6 +20,6 @@ export default function Home() {
       <Contact />
       <ChatBot />
       <div id="overlay" />
-    </div>
+    </>
   );
 }

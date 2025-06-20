@@ -55,7 +55,7 @@ export default function Header() {
         <div
           className={`absolute md:relative top-full left-0 w-full md:w-auto bg-slate-900/95 md:bg-transparent transition-all duration-300 ease-in-out ${
             isOpen ? "max-h-96" : "max-h-0"
-          } md:max-h-full overflow-hidden md:flex md:items-center`}
+          } md:max-h-full md:flex md:items-center`}
         >
           <div className="flex flex-col md:flex-row md:space-x-8 p-4 md:p-0">
             {navLinks.map((item) => (
