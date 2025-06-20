@@ -63,7 +63,7 @@ export default function Hero() {
           <span className="cursor"></span>
         </h1>
         <p className="text-xl md:text-2xl text-gray-400 mt-4 text-balance">
-          AI & Software Engineer
+          AI & Software
         </p>
         <a href="/cv.pdf" download className="mt-8 inline-block btn-primary">
           Download My CV
