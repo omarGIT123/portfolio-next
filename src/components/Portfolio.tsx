@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Key } from "react";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { Project } from "./utils/types";
 import { projects } from "./consts/projects";
 import { useAppContext } from "@/context/AppContext";
