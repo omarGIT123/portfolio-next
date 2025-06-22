@@ -1,9 +1,6 @@
 import Image from "next/image";
 import { Project } from "../utils/types";
 
-// ============================================================================
-// 1. IMAGE IMPORTS (NOW INCLUDING THUMBNAILS)
-// ============================================================================
 // Card Thumbnails
 import thumbSynai from "@/assets/imgs/synai.jpg";
 import thumbAsr from "@/assets/imgs/asr.jpg";
@@ -23,9 +20,6 @@ import cap2 from "@/assets/imgs/caps/2.png";
 import cap4 from "@/assets/imgs/caps/4.png";
 import cap6 from "@/assets/imgs/caps/6.png";
 
-// ============================================================================
-// 2. PROJECTS DATA ARRAY (WITH THUMBNAILS)
-// ============================================================================
 export const projects: Project[] = [
   {
     title: "SynAI Writing Assistant",
@@ -33,7 +27,7 @@ export const projects: Project[] = [
       "A Google Docs extension for writing assistance, powered by Large Language Models.",
     tags: ["JavaScript", "LLM", "Python", "Google Workspace"],
     category: "nlp",
-    thumbnail: thumbSynai, // <-- THUMBNAIL ADDED
+    thumbnail: thumbSynai,
     modalContent: () => (
       <div className="space-y-12 text-[var(--text-secondary)]">
         <section className="text-center">
@@ -321,7 +315,7 @@ export const projects: Project[] = [
       "A real-time system to track gaze coordinates on a screen using computer vision.",
     tags: ["Python", "Pytorch", "ML", "Computer Vision"],
     category: "ml",
-    thumbnail: thumbGaze, // <-- THUMBNAIL ADDED
+    thumbnail: thumbGaze,
     modalContent: () => (
       <div className="space-y-12 text-[var(--text-secondary)]">
         <section className="text-center">
@@ -471,7 +465,7 @@ export const projects: Project[] = [
       "Combines facial recognition and IoT to simulate an automatic, secure garage door.",
     tags: ["Python", "Facial Recognition", "Arduino", "IOT"],
     category: "ml",
-    thumbnail: thumbGarage, // <-- THUMBNAIL ADDED
+    thumbnail: thumbGarage,
     modalContent: () => (
       <div className="space-y-12 text-[var(--text-secondary)]">
         <section className="text-center">
@@ -581,7 +575,7 @@ export const projects: Project[] = [
       "An OCR system built with Flutter and Python to extract structured data from Tunisian ID cards.",
     tags: ["Python", "OCR", "Flutter", "API"],
     category: "academic",
-    thumbnail: thumbOcr, // <-- THUMBNAIL ADDED
+    thumbnail: thumbOcr,
     modalContent: () => (
       <div className="space-y-12 text-[var(--text-secondary)]">
         <section className="text-center">

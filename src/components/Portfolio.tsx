@@ -1,10 +1,16 @@
 "use client";
 
 import { useState, useEffect, Key } from "react";
-import Image from "next/image";
-import { Project, ModalProps } from "./utils/types"; // Make sure path is correct
-import { projects } from "./consts/projects"; // Make sure path is correct
+import Image, { StaticImageData } from "next/image";
+import { Project } from "./utils/types";
+import { projects } from "./consts/projects";
 import { useAppContext } from "@/context/AppContext";
+import { motion, AnimatePresence, Variants } from "framer-motion";
+
+interface ModalProps {
+  project: Project | null;
+  onClose: () => void;
+}
 
 const filters = [
   { label: "All", value: "all" },
@@ -17,14 +23,39 @@ function Modal({ project, onClose }: ModalProps) {
   if (!project) return null;
   const ModalContent = project.modalContent;
 
+  const tvLineEffect: Variants = {
+    hidden: {
+      clipPath: "inset(50% 50% 50% 50%)",
+      opacity: 0,
+    },
+    visible: {
+      clipPath: "inset(0% 0% 0% 0%)",
+      opacity: 1,
+    },
+    exit: {
+      clipPath: "inset(50% 0% 50% 0%)",
+      opacity: 0,
+    },
+  };
+
   return (
-    <div
+    <motion.div
       className="fixed bg-black/60 backdrop-blur-sm inset-0 z-50 flex justify-center items-center p-4"
       onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
     >
-      <div
+      {/* The main modal card with the TV animation */}
+      <motion.div
         className="card border-none p-6 sm:p-8 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar"
         onClick={(e) => e.stopPropagation()}
+        variants={tvLineEffect}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
       >
         <div className="flex justify-between items-start mb-6">
           <h2 className="text-2xl font-bold text-[var(--text-primary)]">
@@ -37,47 +68,44 @@ function Modal({ project, onClose }: ModalProps) {
             &times;
           </button>
         </div>
+        <div className="w-full h-64 mb-6 rounded-lg overflow-hidden">
+          <Image
+            src={project.thumbnail}
+            alt={`${project.title} thumbnail`}
+            className="w-full h-full object-cover"
+            priority
+          />
+        </div>
         <ModalContent />
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
 export default function Portfolio() {
   const [filter, setFilter] = useState("all");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-
-  // Get the project to open from the shared context
   const { projectToOpen, setProjectToOpen } = useAppContext();
 
-  // This useEffect hook now listens to the SHARED context state
   useEffect(() => {
     if (projectToOpen) {
       const project = projects.find(
         (p) => p.title.toLowerCase() === projectToOpen.toLowerCase()
       );
-      if (project) {
-        setSelectedProject(project);
-      } else {
-        console.warn(
-          `ChatBot requested a project that does not exist: "${projectToOpen}"`
-        );
-        setProjectToOpen(null); // Clear the invalid command
-      }
+      setSelectedProject(project || null);
     } else {
-      setSelectedProject(null); // Close the modal if the context command is cleared
+      setSelectedProject(null);
     }
-  }, [projectToOpen, setProjectToOpen]);
+  }, [projectToOpen]);
+
+  const handleCloseModal = () => {
+    setProjectToOpen(null);
+  };
 
   const filteredProjects =
     filter === "all"
       ? projects
       : projects.filter((project: Project) => project.category === filter);
-
-  // When the user closes the modal, we must also clear the context state
-  const handleCloseModal = () => {
-    setProjectToOpen(null);
-  };
 
   return (
     <section id="portfolio" className="py-20">
@@ -107,10 +135,10 @@ export default function Portfolio() {
             (project: Project, index: Key | null | undefined) => (
               <button
                 key={index}
-                className="card group flex flex-col text-left "
-                onClick={() => setProjectToOpen(project.title)} // Set command on click
+                className="card group flex flex-col text-left"
+                onClick={() => setProjectToOpen(project.title)}
               >
-                <div className="w-full h-48 ">
+                <div className="w-full h-48 overflow-hidden">
                   <Image
                     src={project.thumbnail}
                     alt={`${project.title} thumbnail`}
@@ -140,7 +168,12 @@ export default function Portfolio() {
           )}
         </div>
       </div>
-      <Modal project={selectedProject} onClose={handleCloseModal} />
+
+      <AnimatePresence>
+        {selectedProject && (
+          <Modal project={selectedProject} onClose={handleCloseModal} />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

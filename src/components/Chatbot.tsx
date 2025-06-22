@@ -2,32 +2,49 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Send, Bot, X, MessageSquare, User } from "lucide-react";
-import { LlmAction, useAppContext } from "@/context/AppContext"; // Ensure this path is correct
-import { useScrollAndVerify } from "@/app/hooks/useScrollTo"; // IMPORT THE NEW HOOK
+import { LlmAction, useAppContext } from "@/context/AppContext";
+import { useScrollAndVerify } from "@/app/hooks/useScrollTo";
+import { useTypingEffect } from "@/app/hooks/useTypingEffect";
 
+// Interface for a message in the chat history
 interface ChatMessage {
-  role: "user" | "bot";
+  role: "user" | "assistant";
   content: string;
 }
+
+// SIMPLIFIED BotMessage component. It's now a "dumb" component that just displays text.
+const BotMessageDisplay = ({
+  content,
+  isTyping,
+}: {
+  content: string;
+  isTyping: boolean;
+}) => {
+  return (
+    <div className="flex items-start gap-3 justify-start">
+      <Bot className="h-6 w-6 text-blue-400 flex-shrink-0 mt-1" />
+      <div className="max-w-[85%] rounded-lg px-4 py-2 text-sm whitespace-pre-wrap bg-slate-800 text-slate-200 rounded-bl-none">
+        {content}
+        {isTyping && (
+          <span className="inline-block w-1 h-4 animate-pulse ml-1 bg-white"></span>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [userMessage, setUserMessage] = useState<string>("");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
-  const [typingMessage, setTypingMessage] = useState<string | null>(null);
+  const [liveBotMessage, setLiveBotMessage] = useState<string | null>(null);
+  const [isThinking, setIsThinking] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [scrollContainerId, setScrollContainerId] = useState<LlmAction | null>(
-    null
-  );
-  const {
-    commandQueue,
-    setCommandQueue,
-    isProcessingQueue,
-    setIsProcessingQueue,
-    setProjectToOpen,
-  } = useAppContext();
 
-  const { scrollTo } = useScrollAndVerify(); // USE THE NEW HOOK
+  const { typedText, isFinished } = useTypingEffect(liveBotMessage || "");
+
+  const { commandQueue, setCommandQueue, setProjectToOpen } = useAppContext();
+  const { scrollTo } = useScrollAndVerify();
 
   const suggestions = [
     "Who is Omar?",
@@ -36,117 +53,85 @@ export default function ChatBot() {
     "What's his experience?",
   ];
 
-  useEffect(() => {
-    if (scrollContainerId) {
-      scrollTo(scrollContainerId.section).then(() => {
-        console.log("HEREEE ");
-        console.log("scrollContainerId", scrollContainerId);
-        if (
-          scrollContainerId.section === "portfolio" &&
-          scrollContainerId.card
-        ) {
-          setProjectToOpen(scrollContainerId.card);
+  const handleApiResponse = (actions: LlmAction[]) => {
+    if (!actions || actions.length === 0) {
+      setLiveBotMessage("Sorry, I couldn't find an answer for that.");
+      return;
+    }
+    const action = actions[0];
+
+    if (action.section) {
+      scrollTo(action.section).then(() => {
+        if (action.section === "portfolio" && action.card) {
+          setProjectToOpen(action.card);
         }
-        typeMessage(scrollContainerId.information).then(() => {
-          console.log("Message typed:", scrollContainerId.information);
-          if (scrollContainerId.card) {
-          }
-          if (
-            scrollContainerId.section === "portfolio" &&
-            scrollContainerId.card
-          ) {
-            setProjectToOpen(null);
-          }
-          setCommandQueue((prev) => prev.slice(1));
-          setIsProcessingQueue(false);
-        });
       });
     }
-  }, [scrollContainerId]);
 
-  const typeMessage = (text: string) => {
-    return new Promise<void>((resolve) => {
-      if (!text) {
-        resolve();
-        return;
-      }
-      setTypingMessage("");
-      let i = 0;
-      const typingInterval = setInterval(() => {
-        if (i < text.length) {
-          setTypingMessage((prev) => (prev ?? "") + text.charAt(i));
-          i++;
-        } else {
-          clearInterval(typingInterval);
-          setChatHistory((prev) => [...prev, { role: "bot", content: text }]);
-          setTypingMessage(null);
-          resolve();
-        }
-      }, 30);
-    });
+    setLiveBotMessage(action.information);
+    setCommandQueue(actions.slice(1));
   };
-  useEffect(() => {
-    const processQueue = () => {
-      if (commandQueue.length > 0 && !isProcessingQueue) {
-        setIsProcessingQueue(true);
-        const action = commandQueue[0];
-
-        if (action.section) {
-          try {
-            console.log("Scrolling to section:", action.section);
-            setScrollContainerId(action);
-          } catch (error) {
-            console.error("Scroll failed:", error);
-          }
-        }
-      }
-    };
-
-    processQueue();
-  }, [commandQueue]);
-  // The rest of the component remains the same...
 
   const handleSendMessage = async (messageText?: string) => {
     const message = messageText || userMessage;
-    if (message.trim() === "" || isProcessingQueue) return;
+    if (message.trim() === "" || isThinking || liveBotMessage) return;
 
     setUserMessage("");
     setChatHistory((prev) => [...prev, { role: "user", content: message }]);
+    setIsThinking(true);
 
     try {
       const response = await fetch(
-        `/api/chat?query=${encodeURIComponent(message.toLowerCase())}`
+        `/api/chat?query=${encodeURIComponent(message.toLowerCase())}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ history: chatHistory }),
+        }
       );
       if (!response.ok) throw new Error("API response was not ok.");
-
       const { data } = await response.json();
-
-      if (data && Array.isArray(data) && data.length > 0) {
-        setCommandQueue(data);
-      } else {
-        await typeMessage("Sorry, I couldn't find an answer for that.");
-      }
+      setIsThinking(false);
+      handleApiResponse(data);
     } catch (error) {
+      setIsThinking(false);
       console.error("Failed to fetch from chat API:", error);
-      await typeMessage("Sorry, I'm having trouble connecting right now.");
+      setLiveBotMessage("Sorry, I'm having trouble connecting right now.");
     }
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory, typingMessage]);
+    if (commandQueue.length > 0) {
+      handleApiResponse(commandQueue);
+    }
+  }, [commandQueue]);
 
   useEffect(() => {
-    if (isOpen && chatHistory.length === 0) {
-      setChatHistory([
-        {
-          role: "bot",
-          content:
-            "Hello! I'm SynAI, Omar's personal assistant. Ask me anything about his portfolio!",
-        },
+    if (isFinished && liveBotMessage) {
+      setChatHistory((prev) => [
+        ...prev,
+        { role: "assistant", content: liveBotMessage },
       ]);
+      setLiveBotMessage(null);
     }
-  }, [isOpen, chatHistory.length]);
+  }, [isFinished, liveBotMessage]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [typedText, chatHistory, isThinking]);
+
+  useEffect(() => {
+    if (isOpen && chatHistory.length === 0 && !liveBotMessage && !isThinking) {
+      const timer = setTimeout(() => {
+        setLiveBotMessage(
+          "Hello! I'm SynAI, Omar's personal assistant 🤖. I'm ready to answer your questions about Omar's work! \n\n Please keep in mind that I treat every question as a new one and don't have a memory of our conversation. I'm running on a simple model for now. Sorry! 😅"
+        );
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, chatHistory, liveBotMessage, isThinking]);
 
   const toggleOpen = () => setIsOpen((prev) => !prev);
 
@@ -154,11 +139,11 @@ export default function ChatBot() {
     <>
       <button
         onClick={toggleOpen}
+        aria-label="Open Chat"
         className={`fixed bottom-6 right-6 z-[9998] rounded-full p-4 shadow-lg transition-all duration-300 ${
           isOpen ? "opacity-0 scale-75" : "opacity-100 scale-100"
         }`}
         style={{ backgroundColor: "rgb(var(--accent-rgb))" }}
-        aria-label="Open Chat"
       >
         <MessageSquare className="h-8 w-8 text-white" />
       </button>
@@ -185,37 +170,37 @@ export default function ChatBot() {
 
         <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
           <div className="flex flex-col gap-4">
-            {chatHistory.map((msg, index) => (
-              <div
-                key={index}
-                className={`flex items-start gap-3 ${
-                  msg.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                {msg.role === "bot" && (
-                  <Bot className="h-6 w-6 text-blue-400 flex-shrink-0 mt-1" />
-                )}
-                <div
-                  className={`max-w-[85%] rounded-lg px-4 py-2 text-sm whitespace-pre-wrap ${
-                    msg.role === "user"
-                      ? "bg-blue-600 text-white rounded-br-none"
-                      : "bg-slate-800 text-slate-200 rounded-bl-none"
-                  }`}
-                >
-                  {msg.content}
-                </div>
-                {msg.role === "user" && (
+            {chatHistory.map((msg, index) =>
+              msg.role === "user" ? (
+                <div key={index} className="flex items-start gap-3 justify-end">
+                  <div className="max-w-[85%] rounded-lg px-4 py-2 text-sm whitespace-pre-wrap bg-blue-600 text-white rounded-br-none">
+                    {msg.content}
+                  </div>
                   <User className="h-6 w-6 bg-slate-700 p-1 rounded-full flex-shrink-0 mt-1" />
-                )}
-              </div>
-            ))}
+                </div>
+              ) : (
+                <BotMessageDisplay
+                  key={index}
+                  content={msg.content}
+                  isTyping={false}
+                />
+              )
+            )}
 
-            {typingMessage !== null && (
+            {/* Render the "live" message using the new display component */}
+            {liveBotMessage && (
+              <BotMessageDisplay content={typedText} isTyping={!isFinished} />
+            )}
+
+            {isThinking && (
               <div className="flex items-start gap-3 justify-start">
                 <Bot className="h-6 w-6 text-blue-400 flex-shrink-0 mt-1" />
-                <div className="max-w-[85%] rounded-lg px-4 py-2 text-sm whitespace-pre-wrap bg-slate-800 text-slate-200 rounded-bl-none">
-                  {typingMessage}
-                  <span className="inline-block w-2 h-4 bg-white animate-pulse ml-1"></span>
+                <div className="max-w-[85%] rounded-lg px-4 py-2 text-sm bg-slate-800 text-slate-200 rounded-bl-none">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce"></span>
+                  </div>
                 </div>
               </div>
             )}
@@ -229,7 +214,7 @@ export default function ChatBot() {
               <button
                 key={s}
                 onClick={() => handleSendMessage(s)}
-                disabled={isProcessingQueue}
+                disabled={isThinking || !!liveBotMessage}
                 className="text-xs px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded-full text-slate-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {s}
@@ -241,17 +226,17 @@ export default function ChatBot() {
               type="text"
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === "Enter" && !isProcessingQueue && handleSendMessage()
-              }
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
               placeholder="Ask me anything..."
               className="w-full p-2 rounded-lg bg-slate-800 text-white border border-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
-              disabled={isProcessingQueue}
+              disabled={isThinking || !!liveBotMessage}
             />
             <button
               onClick={() => handleSendMessage()}
               className="p-2 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isProcessingQueue || userMessage.trim() === ""}
+              disabled={
+                isThinking || !!liveBotMessage || userMessage.trim() === ""
+              }
               style={{ backgroundColor: "rgb(var(--accent-rgb))" }}
             >
               <Send className="h-5 w-5" />

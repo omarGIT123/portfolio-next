@@ -14,7 +14,7 @@ export function useScrollAndVerify() {
 
       const checkVisibility = () => {
         const rect = element.getBoundingClientRect();
-        // Check if the element is reasonably within the viewport
+
         return rect.top < window.innerHeight && rect.bottom >= 0;
       };
 
@@ -23,7 +23,6 @@ export function useScrollAndVerify() {
         block: "center",
       });
 
-      // Polling mechanism to wait for the scroll to finish
       const startTime = Date.now();
       const timeout = 2500;
 

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("query") || "";
+    const {history} = await request.json();
+    console.log("history", history);
     if (!query) {
       return NextResponse.json(
         { error: "Query parameter is required" },
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
     const n = setTimeout(() => {
       t.abort();
     }, 2e4);
-
+    
     try {
       const response = await fetch(
         process.env.isDev

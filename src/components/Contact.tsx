@@ -1,30 +1,41 @@
 "use client";
 
 import { useRef, useState } from "react";
-// import { init, sendForm } from "emailjs-com";
-
-// init("YOUR_EMAILJS_USER_ID");
+// 1. Import the correct EmailJS package
+import emailjs from "@emailjs/browser";
 
 export default function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<"success" | "error" | "">("");
+
+  const serviceId = "service_rpvslne";
+  const templateId = "template_dqsibul";
+  const publicKey = "QhoY9h2lpG987Ab_m";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formRef.current) {
-      setStatus("");
-      // try {
-      //   await sendForm("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", formRef.current);
-      //   setStatus("success");
-      //   formRef.current.reset();
-      // } catch (error) {
-      //   console.error(error);
-      //   setStatus("error");
-      // }
 
-      // Mock success for demo purposes
-      alert("Form submitted! (This is a demo)");
-      formRef.current.reset();
+    if (formRef.current) {
+      setIsSubmitting(true);
+      setStatus("");
+
+      emailjs
+        .sendForm(serviceId, templateId, formRef.current, publicKey)
+        .then(
+          (result) => {
+            console.log("SUCCESS!", result.text);
+            setStatus("success");
+            formRef.current?.reset();
+          },
+          (error) => {
+            console.error("FAILED...", error.text);
+            setStatus("error");
+          }
+        )
+        .finally(() => {
+          setIsSubmitting(false);
+        });
     }
   };
 
@@ -36,6 +47,7 @@ export default function Contact() {
           <div className="grid md:grid-cols-2 gap-12">
             <div>
               <h3 className="text-2xl font-bold mb-4">Send a Message</h3>
+              {/* 4. Pass the ref to your form */}
               <form ref={formRef} onSubmit={handleSubmit}>
                 <div className="mb-4">
                   <label
@@ -84,17 +96,23 @@ export default function Contact() {
                     required
                   />
                 </div>
-                <button type="submit" className="btn-primary w-full">
-                  Send Message
+                {/* 5. Add a loading state to the button for better UX */}
+                <button
+                  type="submit"
+                  className="btn-primary w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </button>
                 {status === "success" && (
                   <p className="text-green-400 mt-4">
-                    Message sent successfully!
+                    Message sent successfully! Thank you for reaching out.
                   </p>
                 )}
                 {status === "error" && (
                   <p className="text-red-400 mt-4">
-                    Failed to send message. Please try again.
+                    Failed to send message. Please try again later or contact me
+                    directly via email.
                   </p>
                 )}
               </form>

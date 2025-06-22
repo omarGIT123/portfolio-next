@@ -6,7 +6,7 @@ import { createContext, useState, useContext, ReactNode } from "react";
 export interface LlmAction {
   information: string;
   section: string;
-  card?: string; // card is optional
+  card?: string;
 }
 
 // Define the shape of our context's state and functions

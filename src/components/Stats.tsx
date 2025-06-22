@@ -1,7 +1,7 @@
 const stats = [
   { value: "3+", label: "Years of Experience" },
   { value: "7+", label: "Projects Finished" },
-  { value: "99%", label: "Employer Satisfaction" },
+  { value: "100%", label: "Employer Satisfaction" },
   { value: "3k+", label: "Cups of Coffee" },
 ];
 

@@ -6,16 +6,16 @@ const experiences = [
     company: "EmyeHR",
     period: "04/2024 - Present",
     tasks: [
+      "Conducted R&D on AI-driven systems for predicting employee behavioral trends and resignation.",
       "Optimized integration between chat agents and the Emye bot, focusing on prompt quality and cost efficiency.",
       "Fine-tuned GPT-3.5 for precise and efficient SQL generation tailored to company data.",
       "Developed an automatic synthetic data generation program using GPT.",
       "Developed benchmarking systems to evaluate agent performance and visualize results effectively.",
-      "Conducted R&D on AI-driven systems for predicting employee behavioral trends and resignation.",
     ],
   },
   {
     title: "Machine Learning Engineering Intern",
-    company: "Vistaprint", // Company was missing in original, added for context
+    company: "Influence Consulting",
     period: "07/2023 - 09/2023",
     tasks: [
       "Developed an automatic speech recognition AI model fine-tuned on the Tunisian dialect.",

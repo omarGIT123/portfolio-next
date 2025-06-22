@@ -6,7 +6,7 @@ export interface Project {
   description: string;
   tags: string[];
   category: string;
-  thumbnail: StaticImageData; // <-- ADD THIS LINE
+  thumbnail: StaticImageData;
   modalContent: () => JSX.Element;
 }
 

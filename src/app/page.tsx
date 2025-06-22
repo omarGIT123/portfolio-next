@@ -9,7 +9,6 @@ import ChatBot from "../components/Chatbot";
 
 export default function Home() {
   return (
-    // Replace the <div> with a React Fragment <>
     <>
       <Header />
       <Hero />
