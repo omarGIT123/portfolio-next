@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       const response = await fetch(
         process.env.isDev
           ? "http://localhost:4000"
-          : "https://api.omarbradai.tn",
+          : "/api/agent",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
