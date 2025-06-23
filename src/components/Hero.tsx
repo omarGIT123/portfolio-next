@@ -49,8 +49,8 @@ export default function Hero() {
           fill
           style={{ objectFit: "cover" }}
           quality={100}
+          priority
         />
-        {/* The dark overlay to make text readable */}
         <div className="absolute inset-0 bg-black/60"></div>
       </div>
 
