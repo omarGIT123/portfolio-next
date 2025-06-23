@@ -24,16 +24,15 @@ export default function RootLayout({
     <html lang="en" className="!scroll-smooth">
       <body className={`${geistSans.variable} antialiased`}>
         <AppProvider>{children}</AppProvider>
-      </body>
-      <Script
-        strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-      />
-      <Script
-        id="google-analytics"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
@@ -41,8 +40,9 @@ export default function RootLayout({
                 page_path: window.location.pathname,
               });
             `,
-        }}
-      />
+          }}
+        />
+      </body>
     </html>
   );
 }
