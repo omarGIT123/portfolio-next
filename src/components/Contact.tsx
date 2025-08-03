@@ -19,6 +19,19 @@ export default function Contact() {
     if (formRef.current) {
       setIsSubmitting(true);
       setStatus("");
+      // add current time date to the form as a hidden input
+      const dateInput = document.createElement("input");
+      dateInput.type = "hidden";
+      dateInput.name = "time";
+      const now = new Date();
+      const date = now.toLocaleDateString();
+      const time = now.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+      dateInput.value = `${date} ${time}`;
+      formRef.current.appendChild(dateInput);
 
       emailjs
         .sendForm(serviceId, templateId, formRef.current, publicKey)
@@ -35,6 +48,8 @@ export default function Contact() {
         )
         .finally(() => {
           setIsSubmitting(false);
+          // Remove the hidden input after submission
+          formRef.current?.removeChild(dateInput);
         });
     }
   };
@@ -131,10 +146,10 @@ export default function Contact() {
               <p>
                 <strong>Email:</strong> <br />
                 <a
-                  href="mailto:omar.bradai@insat.ucar.tn"
+                  href="mailto:omar.bradai.pro@gmail.com"
                   className="text-gray-300 hover:text-blue-400"
                 >
-                  omar.bradai@insat.ucar.tn
+                  omar.bradai.pro@gmail.com
                 </a>
               </p>
               <p>
