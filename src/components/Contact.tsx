@@ -9,9 +9,12 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<"success" | "error" | "">("");
 
-  const serviceId = "service_rpvslne";
-  const templateId = "template_dqsibul";
-  const publicKey = "QhoY9h2lpG987Ab_m";
+  const serviceId =
+    process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "default_service";
+  const templateId =
+    process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "default_template";
+  const publicKey =
+    process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "default_public_key";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,20 +22,27 @@ export default function Contact() {
     if (formRef.current) {
       setIsSubmitting(true);
       setStatus("");
-      // add current time date to the form as a hidden input
-      const dateInput = document.createElement("input");
-      dateInput.type = "hidden";
-      dateInput.name = "time";
-      const now = new Date();
-      const date = now.toLocaleDateString();
-      const time = now.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-      dateInput.value = `${date} ${time}`;
-      formRef.current.appendChild(dateInput);
-
+      let dateInput: HTMLInputElement;
+      try {
+        // add current time date to the form as a hidden input
+        dateInput = document.createElement("input");
+        dateInput.type = "hidden";
+        dateInput.name = "time";
+        const now = new Date();
+        const date = now.toLocaleDateString();
+        const time = now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        dateInput.value = `${date} ${time}`;
+        formRef.current.appendChild(dateInput);
+      } catch (error) {
+        console.error("Error creating date input:", error);
+        setIsSubmitting(false);
+        setStatus("error");
+        return;
+      }
       emailjs
         .sendForm(serviceId, templateId, formRef.current, publicKey)
         .then(
