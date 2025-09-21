@@ -2,15 +2,26 @@
 
 const experiences = [
   {
-    title: "AI Engineer",
-    company: "EmyeHR",
-    period: "04/2024 - Present",
+    title: "LLM & Full Stack Engineer (Remote)",
+    company: "Navero LTD | United Kingdom (London)",
+    period: "04/2025 - Present",
     tasks: [
-      "Conducted R&D on AI-driven systems for predicting employee behavioral trends and resignation.",
-      "Optimized integration between chat agents and the Emye bot, focusing on prompt quality and cost efficiency.",
-      "Fine-tuned GPT-3.5 for precise and efficient SQL generation tailored to company data.",
-      "Developed an automatic synthetic data generation program using GPT.",
-      "Developed benchmarking systems to evaluate agent performance and visualize results effectively.",
+      "Developed pipelines leveraging Large Language Models (LLMs) for CV analysis, test generation, and document processing.",
+      "Engineered prompt design, tuning, and versioning, including LLM consumption tracking across services.",
+      "Designed and deployed background jobs and microservices using Python, RabbitMQ, and Redis.",
+      "Built and maintained databases and backend applications, integrating RESTful services and third-party APIs.",
+      "Developed user-centric front-end architectures with Next.js, TypeScript, Redux, and cloud infrastructure (GCP), ensuring scalable and performant solutions.",
+    ],
+  },
+  {
+    title: "AI & Full Stack Engineer",
+    company: "EmyeHR",
+    period: "03/2024 - 04/2025",
+    tasks: [
+      "Automated HR workflows with Generative AI conversational agents, reducing manual effort and response times.",
+      "Fine-tuned GPT-3.5 models for efficient SQL query generation on company datasets.",
+      "Built synthetic data pipelines with LLMs and CUDA and created benchmarking systems with visualizations to support data-driven decisions.",
+      "Conducted predictive HR analytics R&D using scikit-learn, online and batch learning for employee behavior and attrition trends.",
     ],
   },
   {
@@ -49,21 +60,33 @@ const educations = [
   },
 ];
 
-const technologies = [
-  "Python",
-  "TensorFlow",
-  "Pandas",
-  "Numpy",
-  "GPT",
-  "Keras",
-  "PostgreSQL",
-  "C++",
-  "Git",
-  "Node.js",
-  "JavaScript",
-  "AWS",
-  "Docker",
-];
+const technologies = {
+  "Programming Languages": ["Python", "C++", "JavaScript", "TypeScript", "SQL"],
+  "Web & Mobile Development": [
+    "React",
+    "Next.js",
+    "AngularJS",
+    "Flutter",
+    "FastAPI",
+    "Supabase",
+  ],
+  "AI / Machine Learning": [
+    "Large Language Models (LLMs)",
+    "Machine Learning",
+    "TensorFlow",
+    "NumPy",
+    "OpenCV",
+  ],
+  "Cloud Platforms": [
+    "Google Cloud Platform (GCP)",
+    "Microsoft Azure",
+    "Amazon Web Services (AWS)",
+  ],
+  "Databases & Messaging": ["PostgreSQL", "RabbitMQ", "Redis"],
+  "Version Control & CI/CD": ["Git", "GitHub", "GitLab", "Bitbucket"],
+  "DevOps & Containerization": ["Docker", "Cloud Storage Solutions"],
+  Methodologies: ["Agile / Scrum"],
+};
 const languages = ["English (C1)", "French (B2)", "Arabic (Native)"];
 
 export default function Resume() {
@@ -115,17 +138,26 @@ export default function Resume() {
 
             <h3 className="text-3xl font-semibold text-white mb-6">Skills</h3>
             <div className="card mb-8">
-              <h4 className="text-xl font-semibold text-white mb-3">
+              <h4 className="text-xl font-semibold text-white mb-6">
                 Technologies
               </h4>
-              <div className="flex flex-wrap gap-2">
-                {technologies.map((tech) => (
-                  <span
-                    key={tech}
-                    className="bg-slate-700 text-slate-300 px-3 py-1 rounded-md text-sm"
-                  >
-                    {tech}
-                  </span>
+              <div className="space-y-4">
+                {Object.entries(technologies).map(([category, skills]) => (
+                  <div key={category}>
+                    <h5 className="text-lg font-medium text-blue-400 mb-2">
+                      {category}
+                    </h5>
+                    <div className="flex flex-wrap gap-2">
+                      {skills.map((skill) => (
+                        <span
+                          key={skill}
+                          className="bg-slate-700 text-slate-300 px-3 py-1 rounded-md text-sm"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

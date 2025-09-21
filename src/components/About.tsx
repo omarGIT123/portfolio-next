@@ -20,7 +20,9 @@ export default function About() {
         <h2 className="section-heading">Who Am I?</h2>
         <div className="grid md:grid-cols-2 gap-8 fade-in">
           <div className="card">
-            <h3 className="text-2xl font-semibold mb-2">An AI Engineer</h3>
+            <h3 className="text-2xl font-semibold mb-2">
+              AI & Full Stack Engineer
+            </h3>
             <div
               className="w-16 h-1 bg-blue-600 rounded-full mb-4"
               style={{ backgroundColor: "rgb(var(--accent-rgb))" }}
@@ -43,7 +45,7 @@ export default function About() {
                 <strong>Birthdate:</strong> 08/08/2000
               </li>
               <li>
-                <strong>Email:</strong> omar.bradai@insat.ucar.tn
+                <strong>Email:</strong> omar.bradai.pro@gmail.com
               </li>
               <li>
                 <strong>Phone:</strong> + (216) 20 681 965
