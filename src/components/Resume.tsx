@@ -8,7 +8,7 @@ const experiences = [
     tasks: [
       "Developed pipelines leveraging Large Language Models (LLMs) for CV analysis, test generation, and document processing.",
       "Engineered prompt design, tuning, and versioning, including LLM consumption tracking across services.",
-      "Designed and deployed background jobs and microservices using Python, RabbitMQ, and Redis.",
+      "Designed and deployed background jobs and microservices using Python and RabbitMQ.",
       "Built and maintained databases and backend applications, integrating RESTful services and third-party APIs.",
       "Developed user-centric front-end architectures with Next.js, TypeScript, Redux, and cloud infrastructure (GCP), ensuring scalable and performant solutions.",
     ],
