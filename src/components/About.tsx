@@ -8,8 +8,12 @@ const expertiseData = [
     desc: "Working with Large Language Models and developing advanced NLP-based solutions.",
   },
   {
-    title: "Data Engineering",
-    desc: "Designing and building efficient systems for collecting, storing, and analyzing data at scale.",
+    title: "Full Stack Development",
+    desc: "Creating dynamic, responsive web applications using modern frameworks and technologies.",
+  },
+  {
+    title: "Cloud Computing",
+    desc: "Leveraging cloud platforms to deploy, manage, and scale applications and services.",
   },
 ];
 
@@ -58,7 +62,7 @@ export default function About() {
         </div>
         <div className="mt-16">
           <h3 className="text-3xl font-bold text-center mb-10">My Expertise</h3>
-          <div className="grid md:grid-cols-3 gap-8 fade-in">
+          <div className="grid md:grid-cols-4 gap-8 fade-in">
             {expertiseData.map((expertise, index) => (
               <div key={index} className="card text-center">
                 <h4 className="text-xl font-semibold text-white">
