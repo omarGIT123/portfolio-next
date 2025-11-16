@@ -54,22 +54,24 @@ export default function ChatBot() {
   ];
 
   const handleApiResponse = (actions: LlmAction[]) => {
+    // If no actions, show a fallback message
     if (!actions || actions.length === 0) {
       setLiveBotMessage("Sorry, I couldn't find an answer for that.");
       return;
     }
-    const action = actions[0];
 
-    if (action.section) {
-      scrollTo(action.section).then(() => {
-        if (action.section === "portfolio" && action.card) {
-          setProjectToOpen(action.card);
+    const [first, ...rest] = actions;
+    setCommandQueue(rest);
+
+    if (first.section) {
+      scrollTo(first.section).then(() => {
+        if (first.section === "portfolio" && first.card) {
+          setProjectToOpen(first.card);
         }
       });
     }
 
-    setLiveBotMessage(action.information);
-    setCommandQueue(actions.slice(1));
+    setLiveBotMessage(first.information);
   };
 
   const handleSendMessage = async (messageText?: string) => {
@@ -102,19 +104,39 @@ export default function ChatBot() {
     }
   };
 
-  useEffect(() => {
-    if (commandQueue.length > 0) {
-      handleApiResponse(commandQueue);
-    }
-  }, [commandQueue]);
+  // We no longer immediately re-run handleApiResponse whenever the
+  // commandQueue changes. Instead, we dequeue and run the next action
+  // once the current message finishes typing (see the isFinished effect).
 
   useEffect(() => {
+    // When the current message finished typing, add it to history and
+    // then, if there are queued actions, start the next one.
     if (isFinished && liveBotMessage) {
       setChatHistory((prev) => [
         ...prev,
         { role: "assistant", content: liveBotMessage },
       ]);
+
+      // Clear the currently-typing message so the UI settles.
       setLiveBotMessage(null);
+      setProjectToOpen(null);
+      // If there are pending actions in the queue, dequeue the next
+      // and start typing it (and handle section navigation).
+      if (commandQueue && commandQueue.length > 0) {
+        const [next, ...rest] = commandQueue;
+        setCommandQueue(rest);
+
+        if (next.section) {
+          scrollTo(next.section).then(() => {
+            if (next.section === "portfolio" && next.card) {
+              setProjectToOpen(next.card);
+            }
+          });
+        }
+
+        // Start typing next action's information
+        setLiveBotMessage(next.information);
+      }
     }
   }, [isFinished, liveBotMessage]);
 

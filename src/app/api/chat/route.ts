@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Query parameter is required" }, { status: 400 });
     }
     console.log(`${BACKEND_URL}/api/agent`)
-    const res = await axios.post(`${BACKEND_URL}/api/agent`, { input: query, history }, {
+    const res = await axios.post(`${BACKEND_URL}/api/agent`, { input: query }, {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
